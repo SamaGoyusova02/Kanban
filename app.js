@@ -7,6 +7,8 @@ const modal = document.getElementById('taskModal');
 const openModalBtn = document.getElementById('openModalBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
 const taskForm = document.getElementById('taskForm');
+const searchInput = document.getElementById('searchInput');
+const priorityFilter = document.getElementById('priorityFilter');
 
 document.addEventListener('DOMContentLoaded', () => {
     renderTasks();
@@ -25,10 +27,16 @@ function renderTasks() {
     todoList.innerHTML = '';
     doingList.innerHTML = '';
     doneList.innerHTML = '';
+    const filterText = searchInput.value.toLowerCase().trim();
+    const filterPriority = priorityFilter.value;
+    const filteredTasks = tasks.filter(task => {
+        const matchesSearch = task.title.toLowerCase().includes(filterText) || task.desc.toLowerCase().includes(filterText);
+        const matchesPriority = filterPriority === 'all' || task.priority === filterPriority;
+        return matchesSearch && matchesPriority;
+    });
 
     const counts = { todo: 0, doing: 0, done: 0 };
-
-    tasks.forEach(task => {
+    filteredTasks.forEach(task => {
         counts[task.status]++;
         const card = createTaskElement(task);
         
@@ -175,3 +183,6 @@ window.deleteTask = function(id) {
     saveToLocalStorage();
     renderTasks();
 };
+
+searchInput.addEventListener('input', renderTasks);
+priorityFilter.addEventListener('change', renderTasks);
