@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Idarəetmə</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <span>K</span>
+            <h2>Kanban Idarəetmə</h2>
+        </div>
+        <nav>
+            <div class="inputContainer">
+                <input type="text" id="searchInput" placeholder="Tapşırıq axınında axtar">
+                <span class="searchMark">🔍</span>
+            </div>
+            <select id="priorityFilter">
+                <option value="all">⚡Bütün prioritetlər</option>
+                <option value="low">🟢 Aşağı</option>
+                <option value="medium">🟠 Orta</option>
+                <option value="high">🔴 Yüksək</option>
+            </select>
+            <button id="openModalBtn">+Yeni Tapşırıq</button>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <div class="to-do" data-status="todo">
+                <div class="to-do-title">
+                   <h6>🔵 Gözləmədə</h6>
+                   <span id="todo-count">0</span>
+                </div>
+                <div class="task-list" id="todo-list"></div>
+            </div>
+            <div class="doing" data-status="doing">
+                <div class="doing-title">
+                   <h6>🟠 İcra olunur </h6>
+                   <span id="doing-count">0</span>
+                </div>
+                <div class="task-list" id="doing-list"></div>
+            </div>
+            <div class="done" data-status="done">
+                <div class="done-title">
+                   <h6>🟢 Tamamlandı</h6>
+                   <span id="done-count">0</span>
+                </div>
+                <div class="task-list" id="done-list"></div>
+            </div>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
