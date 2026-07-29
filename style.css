@@ -243,3 +243,21 @@ main section {
     margin-left: 5px;
     font-size: 13px;
 }
+.task-card {
+    cursor: grab;
+    user-select: none;
+}
+
+.task-card:active {
+    cursor: grabbing;
+}
+
+.task-card.dragging {
+    opacity: 0.4;
+}
+
+.task-list.drag-over {
+    background: #e2e8f0;
+    border: 2px dashed #5046e5;
+    border-radius: 8px;
+}

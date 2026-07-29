@@ -2,6 +2,7 @@ let tasks = [
     { id: '1', title: 'Devjoint 1', desc: 'Frontend', priority: 'high', status: 'todo', date: 'M07 15' },
     { id: '2', title: 'DEVJOINT', desc: '', priority: 'low', status: 'done', date: 'M07 15' }
 ];
+
 const modal = document.getElementById('taskModal');
 const openModalBtn = document.getElementById('openModalBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
@@ -9,6 +10,7 @@ const taskForm = document.getElementById('taskForm');
 
 document.addEventListener('DOMContentLoaded', () => {
     renderTasks();
+    setupDragAndDrop();
 });
 
 function renderTasks() {
@@ -43,6 +45,8 @@ function renderTasks() {
 function createTaskElement(task) {
     const card = document.createElement('div');
     card.classList.add('task-card');
+    card.setAttribute('draggable', 'true');
+    card.dataset.id = task.id;
 
     const priorityLabel = task.priority === 'low' ? 'AŞAĞI' : task.priority === 'medium' ? 'ORTA' : 'YÜKSƏK';
 
@@ -59,6 +63,15 @@ function createTaskElement(task) {
         </div>
     `;
 
+    card.addEventListener('dragstart', (e) => {
+        card.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', task.id);
+    });
+
+    card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+    });
+
     return card;
 }
 
@@ -68,13 +81,44 @@ function checkEmptyState(container) {
     }
 }
 
+function setupDragAndDrop() {
+    const lists = document.querySelectorAll('.task-list');
+
+    lists.forEach(list => {
+        list.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            list.classList.add('drag-over');
+        });
+
+        list.addEventListener('dragleave', () => {
+            list.classList.remove('drag-over');
+        });
+
+        list.addEventListener('drop', (e) => {
+            e.preventDefault();
+            list.classList.remove('drag-over');
+            
+            const taskId = e.dataTransfer.getData('text/plain');
+            const targetStatus = list.parentElement.dataset.status;
+
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.status = targetStatus;
+                renderTasks();
+            }
+        });
+    });
+}
+
 openModalBtn.addEventListener('click', () => {
     taskForm.reset();
     document.getElementById('taskId').value = '';
     document.getElementById('modalTitle').textContent = 'Yeni Tapşırıq Yarat';
     modal.classList.add('active');
 });
+
 closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
+
 taskForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const id = document.getElementById('taskId').value;
@@ -106,6 +150,7 @@ taskForm.addEventListener('submit', (e) => {
     renderTasks();
     modal.classList.remove('active');
 });
+
 window.editTask = function(id) {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
@@ -118,6 +163,7 @@ window.editTask = function(id) {
 
     modal.classList.add('active');
 };
+
 window.deleteTask = function(id) {
     tasks = tasks.filter(t => t.id !== id);
     renderTasks();
