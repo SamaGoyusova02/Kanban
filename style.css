@@ -74,6 +74,9 @@ nav button {
     font-weight: 700;
     cursor: pointer;
 }
+main{
+    margin-top: 60px;
+}
 main section {
     display: flex;
     justify-content: center;
@@ -271,6 +274,31 @@ main section {
     .to-do, .doing, .done {
         width: 100%;
         max-width: 500px;
+    }
+}
+footer{
+    background: #5045ee;
+    height: 70px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+     margin-top: 150px;
+     font-size: 12px;
+     
+}
+footer h3{
+animation: animeName 3s ease-in-out infinite;
+}
+@keyframes animeName {
+    0%{
+        transform: scale(1);
+    }
+    50%{
+        transform: scale(1.1);
+    }
+    100%{
+        transform: scale(1);
     }
 }
 

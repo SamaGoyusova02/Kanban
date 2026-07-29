@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kanban Idarəetmə</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -28,21 +30,21 @@
     </header>
     <main>
         <section>
-            <div class="to-do" data-status="todo">
+            <div class="to-do" data-status="todo" data-aos="zoom-in"   data-aos-duration="2000">
                 <div class="to-do-title">
                    <h6>🔵 Gözləmədə</h6>
                    <span id="todo-count">0</span>
                 </div>
                 <div class="task-list" id="todo-list"></div>
             </div>
-            <div class="doing" data-status="doing">
+            <div class="doing" data-status="doing" data-aos="zoom-in"   data-aos-duration="2000">
                 <div class="doing-title">
                    <h6>🟠 İcra olunur </h6>
                    <span id="doing-count">0</span>
                 </div>
                 <div class="task-list" id="doing-list"></div>
             </div>
-            <div class="done" data-status="done">
+            <div class="done" data-status="done" data-aos="zoom-in"   data-aos-duration="2000">
                 <div class="done-title">
                    <h6>🟢 Tamamlandı</h6>
                    <span id="done-count">0</span>
@@ -80,6 +82,13 @@
         </div>
     </div>
     </main>
+    <footer>
+        <h3>Sama Goyushova</h3>
+    </footer>
     <script src="app.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+    AOS.init();
+    </script>
 </body>
 </html>
