@@ -1,8 +1,11 @@
-
 let tasks = [
     { id: '1', title: 'Devjoint 1', desc: 'Frontend', priority: 'high', status: 'todo', date: 'M07 15' },
     { id: '2', title: 'DEVJOINT', desc: '', priority: 'low', status: 'done', date: 'M07 15' }
 ];
+const modal = document.getElementById('taskModal');
+const openModalBtn = document.getElementById('openModalBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const taskForm = document.getElementById('taskForm');
 
 document.addEventListener('DOMContentLoaded', () => {
     renderTasks();
@@ -49,6 +52,10 @@ function createTaskElement(task) {
         ${task.desc ? `<p>${task.desc}</p>` : ''}
         <div class="task-footer">
             <span>⏱️ ${task.date}</span>
+            <div class="task-actions">
+                <button onclick="editTask('${task.id}')">✏️</button>
+                <button onclick="deleteTask('${task.id}')">🗑️</button>
+            </div>
         </div>
     `;
 
@@ -60,3 +67,58 @@ function checkEmptyState(container) {
         container.innerHTML = `<div class="empty-msg">Burada tapşırıq yoxdur</div>`;
     }
 }
+
+openModalBtn.addEventListener('click', () => {
+    taskForm.reset();
+    document.getElementById('taskId').value = '';
+    document.getElementById('modalTitle').textContent = 'Yeni Tapşırıq Yarat';
+    modal.classList.add('active');
+});
+closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
+taskForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = document.getElementById('taskId').value;
+    const title = document.getElementById('taskTitle').value.trim();
+    const desc = document.getElementById('taskDesc').value.trim();
+    const priority = document.getElementById('taskPriority').value;
+
+    if (!title) return;
+
+    if (id) {
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+            task.title = title;
+            task.desc = desc;
+            task.priority = priority;
+        }
+    } else {
+        const newTask = {
+            id: Date.now().toString(),
+            title,
+            desc,
+            priority,
+            status: 'todo',
+            date: 'M07 15'
+        };
+        tasks.push(newTask);
+    }
+
+    renderTasks();
+    modal.classList.remove('active');
+});
+window.editTask = function(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+
+    document.getElementById('taskId').value = task.id;
+    document.getElementById('taskTitle').value = task.title;
+    document.getElementById('taskDesc').value = task.desc;
+    document.getElementById('taskPriority').value = task.priority;
+    document.getElementById('modalTitle').textContent = 'Tapşırığı Redaktə Et';
+
+    modal.classList.add('active');
+};
+window.deleteTask = function(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    renderTasks();
+};

@@ -50,6 +50,35 @@
                 <div class="task-list" id="done-list"></div>
             </div>
         </section>
+      
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal">
+            <h3 id="modalTitle">Yeni Tapşırıq Yarat</h3>
+            <form id="taskForm">
+                <input type="hidden" id="taskId">
+                <div class="form-group">
+                    <label>Başlıq *</label>
+                    <input type="text" id="taskTitle" placeholder="DEVJOINT" required>
+                </div>
+                <div class="form-group">
+                    <label>Açıqlama</label>
+                    <textarea id="taskDesc" placeholder="Tapşırıq haqqında qısa qeyd..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Prioritet dərəcəsi</label>
+                    <select id="taskPriority">
+                        <option value="low">Aşağı (Low)</option>
+                        <option value="medium">Orta (Medium)</option>
+                        <option value="high">Yüksək (High)</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" id="closeModalBtn">Ləğv et</button>
+                    <button type="submit" class="btn-save">Yadda saxla</button>
+                </div>
+            </form>
+        </div>
+    </div>
     </main>
     <script src="app.js"></script>
 </body>
