@@ -1,4 +1,4 @@
-let tasks = [
+let tasks = JSON.parse(localStorage.getItem('kanban_tasks')) || [
     { id: '1', title: 'Devjoint 1', desc: 'Frontend', priority: 'high', status: 'todo', date: 'M07 15' },
     { id: '2', title: 'DEVJOINT', desc: '', priority: 'low', status: 'done', date: 'M07 15' }
 ];
@@ -12,6 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTasks();
     setupDragAndDrop();
 });
+
+function saveToLocalStorage() {
+    localStorage.setItem('kanban_tasks', JSON.stringify(tasks));
+}
 
 function renderTasks() {
     const todoList = document.getElementById('todo-list');
@@ -104,6 +108,7 @@ function setupDragAndDrop() {
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 task.status = targetStatus;
+                saveToLocalStorage();
                 renderTasks();
             }
         });
@@ -147,6 +152,7 @@ taskForm.addEventListener('submit', (e) => {
         tasks.push(newTask);
     }
 
+    saveToLocalStorage();
     renderTasks();
     modal.classList.remove('active');
 });
@@ -166,5 +172,6 @@ window.editTask = function(id) {
 
 window.deleteTask = function(id) {
     tasks = tasks.filter(t => t.id !== id);
+    saveToLocalStorage();
     renderTasks();
 };
