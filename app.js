@@ -1,7 +1,15 @@
-let tasks = JSON.parse(localStorage.getItem('kanban_tasks')) || [
-    { id: '1', title: 'Devjoint 1', desc: 'Frontend', priority: 'high', status: 'todo', date: 'M07 15' },
-    { id: '2', title: 'DEVJOINT', desc: '', priority: 'low', status: 'done', date: 'M07 15' }
-];
+let tasks = [];
+
+try {
+    const storedTasks = localStorage.getItem('kanban_tasks');
+    tasks = storedTasks ? JSON.parse(storedTasks) : [
+        { id: '1', title: 'Devjoint 1', desc: 'Frontend', priority: 'high', status: 'todo', date: 'M07 15' },
+        { id: '2', title: 'DEVJOINT', desc: '', priority: 'low', status: 'done', date: 'M07 15' }
+    ];
+} catch (error) {
+    console.error('localStorage error:', error);
+    tasks = [];
+}
 
 const modal = document.getElementById('taskModal');
 const openModalBtn = document.getElementById('openModalBtn');
@@ -9,6 +17,14 @@ const closeModalBtn = document.getElementById('closeModalBtn');
 const taskForm = document.getElementById('taskForm');
 const searchInput = document.getElementById('searchInput');
 const priorityFilter = document.getElementById('priorityFilter');
+const taskTitleInput = document.getElementById('taskTitle');
+
+const errorMsg = document.createElement('small');
+errorMsg.style.color = '#ef4444';
+errorMsg.style.fontSize = '12px';
+errorMsg.style.marginTop = '4px';
+errorMsg.style.display = 'none';
+taskTitleInput.parentElement.appendChild(errorMsg);
 
 document.addEventListener('DOMContentLoaded', () => {
     renderTasks();
@@ -16,7 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function saveToLocalStorage() {
-    localStorage.setItem('kanban_tasks', JSON.stringify(tasks));
+    try {
+        localStorage.setItem('kanban_tasks', JSON.stringify(tasks));
+    } catch (error) {
+        console.error('localStorage error:', error);
+    }
 }
 
 function renderTasks() {
@@ -27,8 +47,10 @@ function renderTasks() {
     todoList.innerHTML = '';
     doingList.innerHTML = '';
     doneList.innerHTML = '';
+
     const filterText = searchInput.value.toLowerCase().trim();
     const filterPriority = priorityFilter.value;
+
     const filteredTasks = tasks.filter(task => {
         const matchesSearch = task.title.toLowerCase().includes(filterText) || task.desc.toLowerCase().includes(filterText);
         const matchesPriority = filterPriority === 'all' || task.priority === filterPriority;
@@ -62,18 +84,46 @@ function createTaskElement(task) {
 
     const priorityLabel = task.priority === 'low' ? 'AŞAĞI' : task.priority === 'medium' ? 'ORTA' : 'YÜKSƏK';
 
-    card.innerHTML = `
-        <span class="badge ${task.priority}">${priorityLabel}</span>
-        <h4>${task.title}</h4>
-        ${task.desc ? `<p>${task.desc}</p>` : ''}
-        <div class="task-footer">
-            <span>⏱️ ${task.date}</span>
-            <div class="task-actions">
-                <button onclick="editTask('${task.id}')">✏️</button>
-                <button onclick="deleteTask('${task.id}')">🗑️</button>
-            </div>
-        </div>
-    `;
+    const badge = document.createElement('span');
+    badge.className = `badge ${task.priority}`;
+    badge.textContent = priorityLabel;
+
+    const h4 = document.createElement('h4');
+    h4.textContent = task.title;
+
+    card.appendChild(badge);
+    card.appendChild(h4);
+
+    if (task.desc) {
+        const p = document.createElement('p');
+        p.textContent = task.desc;
+        card.appendChild(p);
+    }
+
+    const footer = document.createElement('div');
+    footer.className = 'task-footer';
+
+    const dateSpan = document.createElement('span');
+    dateSpan.textContent = `⏱️ ${task.date}`;
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'task-actions';
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = '✏️';
+    editBtn.addEventListener('click', () => editTask(task.id));
+
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = '🗑️';
+    deleteBtn.addEventListener('click', () => deleteTask(task.id));
+
+    actionsDiv.appendChild(editBtn);
+    actionsDiv.appendChild(deleteBtn);
+
+    footer.appendChild(dateSpan);
+    footer.appendChild(actionsDiv);
+
+    card.appendChild(footer);
 
     card.addEventListener('dragstart', (e) => {
         card.classList.add('dragging');
@@ -89,7 +139,10 @@ function createTaskElement(task) {
 
 function checkEmptyState(container) {
     if (container.children.length === 0) {
-        container.innerHTML = `<div class="empty-msg">Burada tapşırıq yoxdur</div>`;
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'empty-msg';
+        emptyDiv.textContent = 'Burada tapşırıq yoxdur';
+        container.appendChild(emptyDiv);
     }
 }
 
@@ -123,23 +176,43 @@ function setupDragAndDrop() {
     });
 }
 
+function clearError() {
+    errorMsg.textContent = '';
+    errorMsg.style.display = 'none';
+    taskTitleInput.style.borderColor = '';
+}
+
 openModalBtn.addEventListener('click', () => {
     taskForm.reset();
+    clearError();
     document.getElementById('taskId').value = '';
     document.getElementById('modalTitle').textContent = 'Yeni Tapşırıq Yarat';
     modal.classList.add('active');
 });
 
-closeModalBtn.addEventListener('click', () => modal.classList.remove('active'));
+closeModalBtn.addEventListener('click', () => {
+    clearError();
+    modal.classList.remove('active');
+});
+
+taskTitleInput.addEventListener('input', clearError);
 
 taskForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const id = document.getElementById('taskId').value;
-    const title = document.getElementById('taskTitle').value.trim();
+    const title = taskTitleInput.value.trim();
     const desc = document.getElementById('taskDesc').value.trim();
     const priority = document.getElementById('taskPriority').value;
 
     if (!title) return;
+
+    const isDuplicate = tasks.some(t => t.title.toLowerCase() === title.toLowerCase() && t.id !== id);
+    if (isDuplicate) {
+        errorMsg.textContent = 'Bu başlıqda tapşırıq artıq mövcuddur!';
+        errorMsg.style.display = 'block';
+        taskTitleInput.style.borderColor = '#ef4444';
+        return;
+    }
 
     if (id) {
         const task = tasks.find(t => t.id === id);
@@ -162,6 +235,7 @@ taskForm.addEventListener('submit', (e) => {
 
     saveToLocalStorage();
     renderTasks();
+    clearError();
     modal.classList.remove('active');
 });
 
@@ -169,6 +243,7 @@ window.editTask = function(id) {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
 
+    clearError();
     document.getElementById('taskId').value = task.id;
     document.getElementById('taskTitle').value = task.title;
     document.getElementById('taskDesc').value = task.desc;
